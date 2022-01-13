@@ -1,0 +1,41 @@
+plugins {
+    id 'java'
+}
+
+sourceCompatibility=1.16
+
+group 'info.burntrouter'
+version '1.0'
+
+repositories {
+    mavenCentral()
+}
+
+dependencies {
+    implementation("net.dv8tion:JDA:5.0.0-alpha.4") {
+        exclude module: 'opus-java'
+    }
+    implementation group: 'org.json', name: 'json', version: '20180813'
+    implementation group: 'commons-io', name: 'commons-io', version: '2.6'
+    implementation group: 'org.apache.commons', name: 'commons-lang3', version: '3.9'
+    implementation group: 'org.json', name: 'json', version: '20210307'
+    implementation 'org.xerial:sqlite-jdbc:3.36.0.3'
+}
+
+tasks.register('uberJar', Jar) {
+    archiveClassifier = 'uber'
+    duplicatesStrategy = 'include'
+
+    from sourceSets.main.output
+
+    dependsOn configurations.runtimeClasspath
+    from {
+        configurations.runtimeClasspath.findAll { it.name.endsWith('jar') }.collect { zipTree(it) }
+    }
+
+    manifest {
+        attributes(
+                'Main-Class': 'info.burntrouter.HelpThreadBot.Launcher'
+        )
+    }
+}
