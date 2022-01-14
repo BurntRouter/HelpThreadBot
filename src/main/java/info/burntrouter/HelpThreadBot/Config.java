@@ -61,12 +61,68 @@ public class Config {
         }
     }
 
+    public static String getDbHost() {
+        try {
+            return configJSON.getString("db_hostname");
+        } catch (Exception e) {
+            e.printStackTrace();
+            System.exit(1);
+            return null;
+        }
+    }
+
+    public static String getDbPort() {
+        try {
+            return configJSON.getString("db_port");
+        } catch (Exception e) {
+            e.printStackTrace();
+            System.exit(1);
+            return null;
+        }
+    }
+
+    public static String getDbName() {
+        try {
+            return configJSON.getString("db_name");
+        } catch (Exception e) {
+            e.printStackTrace();
+            System.exit(1);
+            return null;
+        }
+    }
+
+    public static String getDbUser() {
+        try {
+            return configJSON.getString("db_user");
+        } catch (Exception e) {
+            e.printStackTrace();
+            System.exit(1);
+            return null;
+        }
+    }
+
+    public static String getDbPass() {
+        try {
+            return configJSON.getString("db_pass");
+        } catch (Exception e) {
+            e.printStackTrace();
+            System.exit(1);
+            return null;
+        }
+    }
+
     private static void createConfig() {
         try {
             JSONObject config = new JSONObject();
             config.put("token", "DISCORD TOKEN HERE");
             config.put("guildid", "GUILDID HERE");
             config.put("channelid", "CHANNEL ID HERE");
+            config.put("db_hostname", "127.0.0.1");
+            config.put("db_port", "3306");
+            config.put("db_name", "HelpThreadBot");
+            config.put("db_user", "root");
+            config.put("db_pass", "password");
+
             FileUtils.writeStringToFile(new File(configPath), config.toString(1), Charset.defaultCharset());
             System.out.println("CREATED CONFIG.JSON FILE");
             System.exit(0);

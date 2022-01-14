@@ -1,54 +1,32 @@
 package info.burntrouter.HelpThreadBot;
 
 import java.sql.*;
+import java.util.ArrayList;
 import java.util.List;
 
 public class Database {
-    public static final String dbPath = "database.db";
+    public static MySQL mySQL;
 
     public Database() {
-        try {
-            connect();
-        } catch (Exception e) {
-            createNewDatabase();
-        }
-
+        connect();
     }
 
-    public static Connection connect() {
-        String url = "jdbc:sqlite:"+dbPath;
-        Connection conn = null;
+    public static void connect() {
         try {
-            conn = DriverManager.getConnection(url);
-        } catch (SQLException e) {
-            System.out.println(e.getMessage());
-        }
-        return conn;
-    }
-
-    public static void createNewDatabase() {
-        try (Connection connection = DriverManager.getConnection(dbPath)) {
-            DatabaseMetaData metaData = connection.getMetaData();
-            createTables();
-            System.out.println("New Database Created");
-        } catch(Exception e) {
+            mySQL = new MySQL("com.mysql.jdbc.Driver", "jdbc:mysql://" + Config.getDbHost() + ":" + Config.getDbPort() + "/" + Config.getDbName() + "?autoReconnect=true&user=" + Config.getDbUser() + "&password=" + Config.getDbPass());
+        } catch (SQLException | ClassNotFoundException e) {
+            mySQL = null;
             e.printStackTrace();
+            System.exit(2);
         }
-    }
-
-    public static void createTables() throws SQLException {
-        connect().prepareStatement("CREATE TABLE threads" +
-                " (userid TEXT, " +
-                "threadid TEXT PRIMARY KEY, " +
-                "threadClosed INTEGER NOT NULL DEFAULT '0')").execute();
     }
 
     public static void createThread(String userid, String threadid) {
     try {
-        PreparedStatement preparedStatement = connect().prepareStatement("INSERT INTO threads (userid, threadid) VALUES (?, ?)");
+        PreparedStatement preparedStatement = mySQL.getStatement("INSERT INTO threads (userid, threadid) VALUES (?, ?)");
         preparedStatement.setString(1, userid);
         preparedStatement.setString(2, threadid);
-        preparedStatement.executeUpdate();
+        preparedStatement.execute();
         preparedStatement.close();
     } catch (Exception e) {
         e.printStackTrace();
@@ -57,7 +35,7 @@ public class Database {
 
     public static boolean isThreadOwner(String userid, String threadid) {
         try {
-            PreparedStatement preparedStatement = connect().prepareStatement("SELECT userid FROM threads WHERE threadid = ?");
+            PreparedStatement preparedStatement = mySQL.getStatement("SELECT userid FROM threads WHERE threadid = ?");
             preparedStatement.setString(1, threadid);
 
             ResultSet resultSet = preparedStatement.executeQuery();
@@ -72,18 +50,24 @@ public class Database {
     }
 
     public static boolean hasOpenThread(String userid) {
-        List<Integer> intList = null;
+        List<Boolean> intList = new ArrayList<>();
         try {
-            PreparedStatement preparedStatement = connect().prepareStatement("SELECT threadClosed FROM threads WHERE userid = ?");
+            PreparedStatement preparedStatement = mySQL.getStatement("SELECT threadClosed FROM threads WHERE userid = ?");
             preparedStatement.setString(1, userid);
 
             ResultSet resultSet = preparedStatement.executeQuery();
-            while(resultSet.next()) {
-                intList.add(resultSet.getInt("threadClosed"));
+            while (resultSet.next()) {
+                intList.add(resultSet.getBoolean("threadClosed"));
             }
             resultSet.close();
             preparedStatement.close();
-            return intList.contains(1);
+            for (boolean bool :
+                    intList) {
+                if (!bool) {
+                    return true;
+                }
+            }
+            return false;
         } catch (Exception e) {
             return false;
         }
@@ -91,11 +75,23 @@ public class Database {
 
     public static void closeThread(String threadid) {
         try {
-            PreparedStatement preparedStatement = connect().prepareStatement("UPDATE threads SET threadClosed = 1 WHERE threadid = ?");
+            PreparedStatement preparedStatement = mySQL.getStatement("UPDATE threads SET threadClosed = 1 WHERE threadid = ?");
             preparedStatement.setString(1, threadid);
             preparedStatement.executeUpdate();
             preparedStatement.close();
         } catch(Exception e) {
+            e.printStackTrace();
+        }
+    }
+
+    public static void setThreadTitle(String threadId, String threadTitle) {
+        try {
+            PreparedStatement preparedStatement = mySQL.getStatement("UPDATE threads SET threadTitle = ? WHERE threadid = ?");
+            preparedStatement.setString(1, threadTitle);
+            preparedStatement.setString(2, threadId);
+            preparedStatement.executeUpdate();
+            preparedStatement.close();
+        } catch (Exception e) {
             e.printStackTrace();
         }
     }

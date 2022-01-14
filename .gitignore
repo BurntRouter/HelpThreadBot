@@ -5,4 +5,4 @@
 gradle/
 config.json
 database.db
-
+build/
