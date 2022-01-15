@@ -54,7 +54,7 @@ public class Listener extends ListenerAdapter {
             if(event.getChannelType().isThread()) {
                 if(event.getMember().hasPermission(Permission.MANAGE_THREADS) ||
                         Database.isThreadOwner(event.getMember().getId(), event.getChannel().getId())) {
-                    event.getHook().setEphemeral(true).getInteraction().reply("Thread has been closed!").complete();
+                    event.getHook().getInteraction().reply("Thread has been closed!").setEphemeral(true).complete();
                     event.getGuild().getThreadChannelById(event.getChannel().getId()).getManager().setArchived(true).queue();
                 }
             } else {
@@ -102,7 +102,7 @@ public class Listener extends ListenerAdapter {
         @Override
         public void run() {
             try {
-                sleep(60000);
+                sleep(300000);
                     if(threadChannel.getHistoryFromBeginning(100).complete().size() == 2) {
                         Database.closeThread(threadChannel.getId());
                         threadChannel.delete().queue();

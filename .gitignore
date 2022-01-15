@@ -2,7 +2,6 @@
 .build/
 .idea/
 .DS_Store
-gradle/
 config.json
 database.db
 build/
