@@ -37,7 +37,7 @@ public class Listener extends ListenerAdapter {
     public void onButtonClick(@NotNull ButtonClickEvent event) {
         String userid = event.getUser().getId();
         if(event.getButton().getId().equals("help") && !Database.hasOpenThread(event.getUser().getId())) {
-            ThreadChannel threadChannel = Bot.textChannel.createThreadChannel(event.getMember().getEffectiveName() + "\'s Thread").complete();
+            ThreadChannel threadChannel = Bot.textChannel.createThreadChannel(event.getMember().getEffectiveName() + "s Thread").complete();
             threadChannel.addThreadMemberById(event.getMember().getId()).queue();
             threadChannel.sendMessage(event.getMember().getAsMention() + " please respond with a **4-5 word summary** to set the thread's title as.\n" +
                     "Ex: `My Pi won't power on.`").queue();
