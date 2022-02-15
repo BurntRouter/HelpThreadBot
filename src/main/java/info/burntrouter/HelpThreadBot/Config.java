@@ -111,6 +111,26 @@ public class Config {
         }
     }
 
+    public static String getManagerRoleID() {
+        try {
+            return configJSON.getString("manager_role_id");
+        } catch (Exception e) {
+            e.printStackTrace();
+            System.exit(1);
+            return null;
+        }
+    }
+
+    public static String getFAQLink() {
+     try {
+         return configJSON.getString("faq_link");
+     } catch (Exception e) {
+         e.printStackTrace();
+         System.exit(1);
+         return null;
+     }
+    }
+
     private static void createConfig() {
         try {
             JSONObject config = new JSONObject();
@@ -122,6 +142,8 @@ public class Config {
             config.put("db_name", "HelpThreadBot");
             config.put("db_user", "root");
             config.put("db_pass", "password");
+            config.put("manager_role_id", "ROLE ID");
+            config.put("faq_link", "FAQ LINK HERE");
 
             FileUtils.writeStringToFile(new File(configPath), config.toString(1), Charset.defaultCharset());
             System.out.println("CREATED CONFIG.JSON FILE");

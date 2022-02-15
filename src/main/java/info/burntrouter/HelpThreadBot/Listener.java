@@ -5,8 +5,8 @@ import net.dv8tion.jda.api.entities.ThreadChannel;
 import net.dv8tion.jda.api.events.channel.ChannelCreateEvent;
 import net.dv8tion.jda.api.events.channel.ChannelDeleteEvent;
 import net.dv8tion.jda.api.events.channel.update.ChannelUpdateArchivedEvent;
-import net.dv8tion.jda.api.events.interaction.ButtonClickEvent;
-import net.dv8tion.jda.api.events.interaction.SlashCommandEvent;
+import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent;
+import net.dv8tion.jda.api.events.interaction.component.ButtonInteractionEvent;
 import net.dv8tion.jda.api.events.message.MessageReceivedEvent;
 import net.dv8tion.jda.api.hooks.ListenerAdapter;
 import org.apache.commons.lang3.StringUtils;
@@ -34,7 +34,7 @@ public class Listener extends ListenerAdapter {
     }
 
     @Override
-    public void onButtonClick(@NotNull ButtonClickEvent event) {
+    public void onButtonInteraction(@NotNull ButtonInteractionEvent event) {
         String userid = event.getUser().getId();
         if(event.getButton().getId().equals("help") && !Database.hasOpenThread(event.getUser().getId())) {
             ThreadChannel threadChannel = Bot.textChannel.createThreadChannel(event.getMember().getEffectiveName() + "s Thread").complete();
@@ -43,22 +43,22 @@ public class Listener extends ListenerAdapter {
                     "Ex: `My Pi won't power on.`").queue();
             Database.createThread(userid, threadChannel.getId());
         } else {
-            event.getHook().getInteraction().reply("You can't open another thread while you have one open!\n" +
+            event.reply("You can't open another thread while you have one open!\n" +
                     "Use `/close` to close your active thread.").setEphemeral(true).queue();
         }
     }
 
     @Override
-    public void onSlashCommand(@NotNull SlashCommandEvent event) {
+    public void onSlashCommandInteraction(@NotNull SlashCommandInteractionEvent event) {
         if(event.getCommandString().replace("/", "").contains("close")) {
             if(event.getChannelType().isThread()) {
                 if(event.getMember().hasPermission(Permission.MANAGE_THREADS) ||
                         Database.isThreadOwner(event.getMember().getId(), event.getChannel().getId())) {
-                    event.getHook().getInteraction().reply("Thread has been closed!").setEphemeral(true).complete();
+                    event.reply("Thread has been closed!").setEphemeral(true).complete();
                     event.getGuild().getThreadChannelById(event.getChannel().getId()).getManager().setArchived(true).queue();
                 }
             } else {
-                event.getHook().getInteraction().reply("This must be used in a thread!").setEphemeral(true).queue();
+                event.reply("This must be used in a thread!").setEphemeral(true).queue();
             }
         }
     }

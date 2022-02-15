@@ -7,7 +7,7 @@ import net.dv8tion.jda.api.entities.Guild;
 import net.dv8tion.jda.api.entities.Message;
 import net.dv8tion.jda.api.entities.TextChannel;
 import net.dv8tion.jda.api.interactions.commands.build.CommandData;
-import net.dv8tion.jda.api.interactions.components.Button;
+import net.dv8tion.jda.api.interactions.components.buttons.Button;
 import net.dv8tion.jda.api.requests.GatewayIntent;
 import net.dv8tion.jda.api.utils.ChunkingFilter;
 
@@ -46,7 +46,7 @@ public class Bot extends Thread {
             System.out.println("Connected!");
 
             System.out.println("Registering Commands");
-            api.getGuildById(Config.getGuildId()).updateCommands().addCommands(new CommandData("close", "Closes thread. Can only be used by thread owner or Blueberry+")).queue();
+            api.getGuildById(Config.getGuildId()).upsertCommand("close", "Closes the thread. Can be used by the thread owner, a moderator, or a somebody with a manager role.").queue();
             System.out.println("Commands Registered!");
 
             System.out.println(api.getSelfUser().getName() + " online. Ping: " + api.getRestPing().complete());
