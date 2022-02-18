@@ -10,6 +10,7 @@ import org.apache.commons.validator.routines.UrlValidator;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Objects;
 
 public class Bot extends Thread {
     public static JDA api;
@@ -47,14 +48,14 @@ public class Bot extends Thread {
             System.out.println("Connected!");
 
             System.out.println("Registering Commands");
-            api.getGuildById(Config.getGuildId()).upsertCommand("close", "Closes the thread. Can be used by the thread owner, a moderator, or a somebody with a manager role.").queue();
+            Objects.requireNonNull(api.getGuildById(Config.getGuildId())).upsertCommand("close", "Closes the thread. Can be used by the thread owner, a moderator, or a somebody with a manager role.").queue();
             System.out.println("Commands Registered!");
 
             System.out.println(api.getSelfUser().getName() + " online. Ping: " + api.getRestPing().complete());
 
             guild = api.getGuildById(Config.getChannelId());
             textChannel = api.getTextChannelById(Config.getChannelId());
-            if(Config.getManagerRoleID() != null && !Config.getManagerRoleID().isEmpty()) {
+            if(Config.getManagerRoleID().matches("\\d+")) {
                 managerRole = guild.getRoleById(Config.getManagerRoleID());
             }
             sendHelpMessage();
