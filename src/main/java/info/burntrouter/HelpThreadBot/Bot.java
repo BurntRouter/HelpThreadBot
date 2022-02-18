@@ -2,20 +2,21 @@ package info.burntrouter.HelpThreadBot;
 
 import net.dv8tion.jda.api.JDA;
 import net.dv8tion.jda.api.JDABuilder;
-import net.dv8tion.jda.api.entities.Activity;
-import net.dv8tion.jda.api.entities.Guild;
-import net.dv8tion.jda.api.entities.Message;
-import net.dv8tion.jda.api.entities.TextChannel;
-import net.dv8tion.jda.api.interactions.commands.build.CommandData;
+import net.dv8tion.jda.api.entities.*;
 import net.dv8tion.jda.api.interactions.components.buttons.Button;
 import net.dv8tion.jda.api.requests.GatewayIntent;
 import net.dv8tion.jda.api.utils.ChunkingFilter;
+import org.apache.commons.validator.routines.UrlValidator;
+
+import java.util.ArrayList;
+import java.util.List;
 
 public class Bot extends Thread {
     public static JDA api;
     public static Message helpMessage;
     public static Guild guild;
     public static TextChannel textChannel;
+    public static Role managerRole;
 
     public Bot() {
         setup();
@@ -53,6 +54,9 @@ public class Bot extends Thread {
 
             guild = api.getGuildById(Config.getChannelId());
             textChannel = api.getTextChannelById(Config.getChannelId());
+            if(Config.getManagerRoleID() != null && !Config.getManagerRoleID().isEmpty()) {
+                managerRole = guild.getRoleById(Config.getManagerRoleID());
+            }
             sendHelpMessage();
         } catch (Exception e) {
             e.printStackTrace();
@@ -62,10 +66,19 @@ public class Bot extends Thread {
     }
 
     public static void sendHelpMessage() {
+        List<Button> buttons = new ArrayList<>();
+        buttons.add(Button.primary("help", "Get Help"));
+        UrlValidator urlValidator = new UrlValidator();
+        if(urlValidator.isValid(Config.getFAQLink())) {
+            buttons.add(Button.link("faq", Config.getFAQLink()));
+        } else {
+            System.out.println("Invalid FAQ link! Skipping...");
+        }
+
         helpMessage = textChannel.sendMessage("Welcome to " + textChannel.getAsMention() + "!\n" +
                         "Before creating a help thread please click the FAQ button.\n" +
                         "If you need help with anything tech related please click `Get Help` button below.\n")
-                .setActionRow(Button.link("https://discord.com/channels/204621105720328193/915461470257565737", "FAQ"),
-                        Button.primary("help", "Get Help")).complete();
+                .setActionRow(buttons).complete();
+
     }
 }
