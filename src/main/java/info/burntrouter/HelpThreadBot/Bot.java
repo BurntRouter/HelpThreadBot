@@ -55,10 +55,10 @@ public class Bot extends Thread {
 
             guild = api.getGuildById(Config.getChannelId());
             textChannel = api.getTextChannelById(Config.getChannelId());
-            if(Config.getManagerRoleID().matches("\\d+")) {
-                managerRole = guild.getRoleById(Config.getManagerRoleID());
-            }
             sendHelpMessage();
+            if(Config.getManagerRoleID().matches("\\d+")) {
+                managerRole = api.getRoleById(Config.getManagerRoleID());
+            }
         } catch (Exception e) {
             e.printStackTrace();
             System.out.println("CRASHED!");
@@ -71,7 +71,7 @@ public class Bot extends Thread {
         buttons.add(Button.primary("help", "Get Help"));
         UrlValidator urlValidator = new UrlValidator();
         if(urlValidator.isValid(Config.getFAQLink())) {
-            buttons.add(Button.link("faq", Config.getFAQLink()));
+            buttons.add(Button.link(Config.getFAQLink(), "FAQ :question:"));
         } else {
             System.out.println("Invalid FAQ link! Skipping...");
         }
